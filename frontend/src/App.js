@@ -11,6 +11,7 @@ function App() {
   const [selectedWish, setSelectedWish] = useState(null);
   const [currentView, setCurrentView] = useState('home');
   const [loading, setLoading] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
   
   // Filters
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -37,12 +38,97 @@ function App() {
     { value: 'high', label: 'Urgent', color: 'bg-red-100 text-red-800' }
   ];
 
+  // Payment processing
+  const [pendingWish, setPendingWish] = useState(null);
+
+  // Check if returning from PayPal payment
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentId = urlParams.get('paymentId');
+    const payerId = urlParams.get('PayerID');
+    
+    if (paymentId && payerId) {
+      handlePaymentReturn(paymentId, payerId);
+    }
+  }, []);
+
+  // Handle PayPal payment return
+  const handlePaymentReturn = async (paymentId, payerId) => {
+    setPaymentLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/payments/execute`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          payment_id: paymentId,
+          payer_id: payerId
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert('Payment successful! Your wish has been posted.');
+        setCurrentView('browse');
+        fetchWishes();
+        fetchStatistics();
+        // Clear URL parameters
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } else {
+        alert('Payment verification failed. Please contact support.');
+      }
+    } catch (error) {
+      console.error('Payment verification error:', error);
+      alert('Payment verification error. Please contact support.');
+    }
+    setPaymentLoading(false);
+  };
+
+  // Create PayPal payment
+  const createPayment = async (amount, currency, purpose, wishId = null) => {
+    setPaymentLoading(true);
+    try {
+      const currentUrl = window.location.origin + window.location.pathname;
+      const returnUrl = `${currentUrl}?paymentSuccess=true`;
+      const cancelUrl = `${currentUrl}?paymentCancelled=true`;
+
+      const response = await fetch(`${API_URL}/api/payments/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: amount,
+          currency: currency,
+          purpose: purpose,
+          wish_id: wishId,
+          return_url: returnUrl,
+          cancel_url: cancelUrl
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // Redirect to PayPal for payment
+        window.location.href = result.approval_url;
+      } else {
+        const error = await response.json();
+        alert(`Payment creation failed: ${error.detail}`);
+      }
+    } catch (error) {
+      console.error('Payment creation error:', error);
+      alert('Payment creation failed. Please try again.');
+    }
+    setPaymentLoading(false);
+  };
+
   // Fetch data functions
   const fetchWishes = async () => {
     try {
       const categoryParam = selectedCategory !== 'All' ? `&category=${selectedCategory}` : '';
       const urgencyParam = selectedUrgency ? `&urgency=${selectedUrgency}` : '';
-      const response = await fetch(`${API_URL}/api/wishes?limit=50${categoryParam}${urgencyParam}`);
+      const response = await fetch(`${API_URL}/api/wishes?limit=50${categoryParam}${urgencyParam}&paid_only=true`);
       const data = await response.json();
       setWishes(data);
     } catch (error) {
@@ -91,12 +177,13 @@ function App() {
     }
   };
 
-  // Create wish
+  // Create wish (now with payment integration)
   const createWish = async (e) => {
     e.preventDefault();
     setLoading(true);
     
     try {
+      // First create the wish
       const response = await fetch(`${API_URL}/api/wishes`, {
         method: 'POST',
         headers: {
@@ -109,26 +196,28 @@ function App() {
       });
       
       if (response.ok) {
-        setFormData({
-          title: '',
-          description: '',
-          amount_needed: '',
-          currency: 'EUR',
-          creator_name: '',
-          creator_email: '',
-          creator_paypal: '',
-          category: 'Education',
-          urgency: 'medium',
-          photo_url: ''
-        });
-        setCurrentView('browse');
-        fetchWishes();
-        fetchStatistics();
+        const newWish = await response.json();
+        setPendingWish(newWish);
+        
+        // Now redirect to payment
+        alert(`Great! Now you need to pay the ${statistics.posting_fee || 2}€ posting fee to publish your wish.`);
+        createPayment(statistics.posting_fee || 2.0, 'EUR', 'posting_fee', newWish.id);
       }
     } catch (error) {
       console.error('Error creating wish:', error);
+      alert('Error creating wish. Please try again.');
     }
     setLoading(false);
+  };
+
+  // Donate to wish
+  const donateToWish = (amount) => {
+    if (!selectedWish) return;
+    
+    const donationAmount = prompt(`How much would you like to donate? (in ${selectedWish.currency})`);
+    if (donationAmount && parseFloat(donationAmount) > 0) {
+      createPayment(parseFloat(donationAmount), selectedWish.currency, 'donation', selectedWish.id);
+    }
   };
 
   useEffect(() => {
@@ -168,6 +257,16 @@ function App() {
   // Home View
   const HomeView = () => (
     <div className="min-h-screen">
+      {/* Payment Loading Overlay */}
+      {paymentLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-lg">Processing payment...</p>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <div 
         className="relative h-screen flex items-center justify-center text-white"
@@ -210,7 +309,7 @@ function App() {
               onClick={() => setCurrentView('create')}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg"
             >
-              Post Your Wish
+              Post Your Wish (€{statistics.posting_fee || 2})
             </button>
             <button 
               onClick={() => setCurrentView('browse')}
@@ -275,21 +374,21 @@ function App() {
                 <span className="text-3xl">✨</span>
               </div>
               <h3 className="text-xl font-semibold mb-4">1. Share Your Story</h3>
-              <p className="text-gray-600">Post your wish with details, photos, and your story. Be authentic and specific about your need.</p>
+              <p className="text-gray-600">Post your wish with details and photos. Pay a small €{statistics.posting_fee || 2} fee to prevent spam and ensure quality.</p>
             </div>
             <div className="text-center p-6">
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-3xl">💝</span>
               </div>
-              <h3 className="text-xl font-semibold mb-4">2. Connect Anonymously</h3>
-              <p className="text-gray-600">Generous donors browse by category and choose wishes that resonate with their hearts.</p>
+              <h3 className="text-xl font-semibold mb-4">2. Connect with Donors</h3>
+              <p className="text-gray-600">Generous people browse by category and choose wishes that resonate with their hearts.</p>
             </div>
             <div className="text-center p-6">
               <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-3xl">🎉</span>
               </div>
               <h3 className="text-xl font-semibold mb-4">3. Dreams Come True</h3>
-              <p className="text-gray-600">Watch your progress grow as donors help fulfill your wish, creating lasting positive impact.</p>
+              <p className="text-gray-600">Watch your progress grow as donors help fulfill your wish through secure PayPal payments.</p>
             </div>
           </div>
         </div>
@@ -374,7 +473,7 @@ function App() {
             onClick={() => setCurrentView('create')}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
           >
-            Post Your Wish
+            Post Your Wish (€{statistics.posting_fee || 2})
           </button>
         </div>
         
@@ -620,7 +719,7 @@ function App() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                PayPal Email (optional)
+                PayPal Email (recommended)
               </label>
               <input
                 type="email"
@@ -629,21 +728,22 @@ function App() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="paypal@email.com (for receiving donations)"
               />
+              <p className="text-sm text-gray-500 mt-1">Donors can send money directly to your PayPal</p>
             </div>
 
             <div className="bg-blue-50 p-4 rounded-lg">
               <p className="text-sm text-blue-800">
-                <strong>Coming Soon:</strong> There will be a 2€ posting fee to prevent spam and maintain quality. 
-                For now, posting is free during our beta phase!
+                <strong>Posting Fee:</strong> €{statistics.posting_fee || 2} to prevent spam and maintain quality. 
+                After posting, you'll be redirected to PayPal for secure payment.
               </p>
             </div>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || paymentLoading}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-4 rounded-lg font-semibold text-lg transition-colors"
             >
-              {loading ? 'Posting Your Wish...' : 'Post Your Wish'}
+              {loading ? 'Creating Your Wish...' : `Post Your Wish (€${statistics.posting_fee || 2})`}
             </button>
           </form>
         </div>
@@ -743,22 +843,28 @@ function App() {
               <div className="bg-green-50 p-6 rounded-lg">
                 <h3 className="text-xl font-semibold mb-4 text-green-800">Help Make This Wish Come True</h3>
                 <p className="text-green-700 mb-4">
-                  Ready to help? Payment integration coming soon! For now, you can contact the wish maker directly.
+                  Ready to help? Make a secure donation through PayPal.
                 </p>
                 
-                {selectedWish.creator_paypal && (
-                  <div className="mb-4">
-                    <strong>PayPal:</strong> {selectedWish.creator_paypal}
-                  </div>
-                )}
-                
-                <div className="mb-4">
-                  <strong>Email:</strong> {selectedWish.creator_email}
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
+                  <button 
+                    onClick={() => donateToWish()}
+                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                  >
+                    💳 Donate via PayPal
+                  </button>
+                  
+                  {selectedWish.creator_paypal && (
+                    <div className="bg-white p-3 rounded-lg">
+                      <div className="text-sm text-gray-600">Direct PayPal:</div>
+                      <div className="font-semibold">{selectedWish.creator_paypal}</div>
+                    </div>
+                  )}
                 </div>
                 
-                <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors">
-                  Coming Soon: Donate Now
-                </button>
+                <div className="text-sm text-gray-600">
+                  <strong>Email:</strong> {selectedWish.creator_email}
+                </div>
               </div>
             </div>
           </div>
@@ -799,7 +905,7 @@ function App() {
               onClick={() => setCurrentView('create')}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
             >
-              Post Wish
+              Post Wish (€{statistics.posting_fee || 2})
             </button>
           </div>
         </div>
