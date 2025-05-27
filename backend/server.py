@@ -193,6 +193,13 @@ async def get_wishes(
     
     for wish in wishes:
         wish["_id"] = str(wish["_id"])
+        # Add default values for missing fields (backward compatibility)
+        if "category" not in wish:
+            wish["category"] = "Other"
+        if "urgency" not in wish:
+            wish["urgency"] = "medium"
+        if "photo_url" not in wish:
+            wish["photo_url"] = None
         # Calculate fulfillment percentage
         if wish["amount_needed"] > 0:
             wish["fulfillment_percentage"] = min(100, (wish["donations_received"] / wish["amount_needed"]) * 100)
