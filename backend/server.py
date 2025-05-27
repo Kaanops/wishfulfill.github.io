@@ -1,75 +1,108 @@
-from fastapi import FastAPI, APIRouter
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pymongo import MongoClient
+from pydantic import BaseModel
+from typing import Optional, List
 import os
-import logging
-from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List
-import uuid
 from datetime import datetime
+import uuid
 
+# Database connection
+MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+client = MongoClient(MONGO_URL)
+db = client.wishplatform
+wishes_collection = db.wishes
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
-
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
-
-# Create the main app without a prefix
 app = FastAPI()
 
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
-
-
-# Define Models
-class StatusCheck(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
-
-# Include the router in the main app
-app.include_router(api_router)
-
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# Pydantic models
+class WishCreate(BaseModel):
+    title: str
+    description: str
+    amount_needed: float
+    currency: str
+    creator_name: str
+    creator_email: str
+    creator_paypal: Optional[str] = None
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+class Wish(BaseModel):
+    id: str
+    title: str
+    description: str
+    amount_needed: float
+    currency: str
+    creator_name: str
+    creator_email: str
+    creator_paypal: Optional[str] = None
+    created_at: datetime
+    status: str = "active"
+    donations_received: float = 0.0
+
+# API Routes
+@app.get("/api/health")
+async def health_check():
+    return {"status": "healthy", "service": "wish-platform"}
+
+@app.post("/api/wishes", response_model=Wish)
+async def create_wish(wish: WishCreate):
+    wish_dict = wish.dict()
+    wish_dict["id"] = str(uuid.uuid4())
+    wish_dict["created_at"] = datetime.utcnow()
+    wish_dict["status"] = "active"
+    wish_dict["donations_received"] = 0.0
+    
+    result = wishes_collection.insert_one(wish_dict)
+    
+    # Return the created wish
+    created_wish = wishes_collection.find_one({"_id": result.inserted_id})
+    created_wish["_id"] = str(created_wish["_id"])
+    
+    return Wish(**created_wish)
+
+@app.get("/api/wishes", response_model=List[Wish])
+async def get_wishes(limit: int = 50):
+    wishes = list(wishes_collection.find({}).sort("created_at", -1).limit(limit))
+    
+    for wish in wishes:
+        wish["_id"] = str(wish["_id"])
+    
+    return [Wish(**wish) for wish in wishes]
+
+@app.get("/api/wishes/{wish_id}", response_model=Wish)
+async def get_wish(wish_id: str):
+    wish = wishes_collection.find_one({"id": wish_id})
+    
+    if not wish:
+        raise HTTPException(status_code=404, detail="Wish not found")
+    
+    wish["_id"] = str(wish["_id"])
+    return Wish(**wish)
+
+@app.put("/api/wishes/{wish_id}/donate")
+async def donate_to_wish(wish_id: str, amount: float):
+    wish = wishes_collection.find_one({"id": wish_id})
+    
+    if not wish:
+        raise HTTPException(status_code=404, detail="Wish not found")
+    
+    # Update donations received
+    new_amount = wish.get("donations_received", 0) + amount
+    wishes_collection.update_one(
+        {"id": wish_id},
+        {"$set": {"donations_received": new_amount}}
+    )
+    
+    return {"message": "Donation recorded", "new_total": new_amount}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
