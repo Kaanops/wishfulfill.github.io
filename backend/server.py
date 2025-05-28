@@ -230,6 +230,94 @@ def init_success_stories():
                 "donor_count": 31,
                 "photo_url": "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg",
                 "category": "Community"
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Small Business Startup Fund",
+                "description": "Anna's dream of opening a local bakery became reality when 42 supporters believed in her vision. Her bakery now employs 6 people!",
+                "amount_fulfilled": 15000.0,
+                "currency": "EUR",
+                "fulfillment_date": datetime.utcnow() - timedelta(days=180),
+                "donor_count": 42,
+                "photo_url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136",
+                "category": "Business"
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Art Therapy for Children",
+                "description": "This creative program for underprivileged kids was fully funded by 28 art lovers. Over 100 children have benefited so far!",
+                "amount_fulfilled": 4500.0,
+                "currency": "EUR",
+                "fulfillment_date": datetime.utcnow() - timedelta(days=60),
+                "donor_count": 28,
+                "photo_url": "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0",
+                "category": "Creative"
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Laptop for Remote Learning",
+                "description": "17-year-old Marcus got his first laptop thanks to 12 donors who wanted to support his education during lockdown. He's now excelling in his studies!",
+                "amount_fulfilled": 800.0,
+                "currency": "EUR",
+                "fulfillment_date": datetime.utcnow() - timedelta(days=20),
+                "donor_count": 12,
+                "photo_url": "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0",
+                "category": "Technology"
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Family Reunion Trip",
+                "description": "After 5 years apart, the Schmidt family was reunited when 19 generous people funded their travel costs. The tears of joy were worth it!",
+                "amount_fulfilled": 2200.0,
+                "currency": "EUR",
+                "fulfillment_date": datetime.utcnow() - timedelta(days=75),
+                "donor_count": 19,
+                "photo_url": "https://images.unsplash.com/photo-1511895426328-dc8714191300",
+                "category": "Family"
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Mental Health Counseling",
+                "description": "David got the therapy he needed thanks to 9 compassionate donors. He's now mentoring others struggling with similar challenges.",
+                "amount_fulfilled": 1800.0,
+                "currency": "EUR",
+                "fulfillment_date": datetime.utcnow() - timedelta(days=40),
+                "donor_count": 9,
+                "photo_url": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2",
+                "category": "Health"
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Dream Wedding for Cancer Survivor",
+                "description": "Emma's fairy tale wedding happened 6 months after beating cancer. 67 donors made her dream day possible during her recovery.",
+                "amount_fulfilled": 6800.0,
+                "currency": "EUR",
+                "fulfillment_date": datetime.utcnow() - timedelta(days=15),
+                "donor_count": 67,
+                "photo_url": "https://images.unsplash.com/photo-1519741497674-611481863552",
+                "category": "Family"
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Music Instruments for Youth Orchestra",
+                "description": "The local youth orchestra got new instruments thanks to 35 music lovers. Now 50 kids can pursue their musical dreams!",
+                "amount_fulfilled": 7500.0,
+                "currency": "EUR",
+                "fulfillment_date": datetime.utcnow() - timedelta(days=95),
+                "donor_count": 35,
+                "photo_url": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f",
+                "category": "Creative"
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Wheelchair Accessible Van",
+                "description": "Tom's mobility was restored when 52 caring people funded his accessible vehicle. Independence has changed his entire life!",
+                "amount_fulfilled": 18500.0,
+                "currency": "EUR",
+                "fulfillment_date": datetime.utcnow() - timedelta(days=200),
+                "donor_count": 52,
+                "photo_url": "https://images.unsplash.com/photo-1544551763-46a013bb70d5",
+                "category": "Health"
             }
         ]
         success_stories_collection.insert_many(demo_stories)
