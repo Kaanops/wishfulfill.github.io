@@ -335,8 +335,8 @@ function App() {
           <h2 className="text-4xl font-bold text-center mb-4">Success Stories</h2>
           <p className="text-xl text-gray-600 text-center mb-16">Real wishes that came true thanks to generous donors</p>
           
-          <div className="grid md:grid-cols-2 gap-8">
-            {successStories.slice(0, 4).map((story) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {successStories.slice(0, 6).map((story) => (
               <div key={story.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all transform hover:-translate-y-1">
                 <img 
                   src={story.photo_url} 
@@ -350,24 +350,43 @@ function App() {
                     </span>
                     <span className="text-sm text-gray-500">{story.category}</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-3">{story.title}</h3>
-                  <p className="text-gray-600 mb-4">{story.description}</p>
+                  <h3 className="text-lg font-semibold mb-3 line-clamp-2">{story.title}</h3>
+                  <p className="text-gray-600 mb-4 text-sm line-clamp-3">{story.description}</p>
                   <div className="flex justify-between items-center">
                     <div>
-                      <div className="text-2xl font-bold text-green-600">
+                      <div className="text-xl font-bold text-green-600">
                         {formatAmount(story.amount_fulfilled, story.currency)}
                       </div>
-                      <div className="text-sm text-gray-500">
-                        {story.donor_count} generous donors
+                      <div className="text-xs text-gray-500">
+                        {story.donor_count} donors
                       </div>
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-xs text-gray-500">
                       {formatDate(story.fulfillment_date)}
                     </div>
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+          
+          <div className="text-center mt-12">
+            <div className="bg-white bg-opacity-80 backdrop-blur-md rounded-lg p-6 inline-block">
+              <h3 className="text-2xl font-bold mb-2">Join Our Success Community</h3>
+              <p className="text-gray-600 mb-4">Over {statistics.active_users || 1200} people are already making dreams come true!</p>
+              <button 
+                onClick={() => setCurrentView('browse')}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold mr-4"
+              >
+                Help Someone Today
+              </button>
+              <button 
+                onClick={() => setCurrentView('create')}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+              >
+                Share Your Dream
+              </button>
+            </div>
           </div>
         </div>
       </div>
