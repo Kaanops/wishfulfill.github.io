@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WishFulfill - Where Dreams Meet Generosity</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Hero Section -->
+    <div class="relative h-screen flex items-center justify-center text-white" 
+         style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1570050785780-3c79854c7813'); background-size: cover; background-position: center;">
+        
+        <div class="text-center max-w-4xl px-4">
+            <h1 class="text-6xl font-bold mb-6">Where Dreams Meet Generosity</h1>
+            <p class="text-xl mb-8">Join thousands who have already made wishes come true. Real stories, real impact, real change.</p>
+            
+            <!-- Statistics -->
+            <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-6 mb-8">
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-4 text-center">
+                    <div>
+                        <div class="text-3xl font-bold">18</div>
+                        <div class="text-sm">Total Wishes</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold">12</div>
+                        <div class="text-sm">Fulfilled</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold">€95,700</div>
+                        <div class="text-sm">Total Raised</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold">66.7%</div>
+                        <div class="text-sm">Success Rate</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold">1,247</div>
+                        <div class="text-sm">Active Users</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold">23</div>
+                        <div class="text-sm">Countries</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-x-4">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg">
+                    Post Your Wish (€2)
+                </button>
+                <button class="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg">
+                    Browse Wishes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Stories -->
+    <div class="py-20 bg-gradient-to-br from-green-50 to-blue-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-4">Success Stories</h2>
+            <p class="text-xl text-gray-600 text-center mb-16">Real wishes that came true thanks to generous donors</p>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Success Story 1 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all">
+                    <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56" alt="Medical Treatment" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">✓ Fulfilled</span>
+                            <span class="text-sm text-gray-500">Health</span>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-3">Medical Treatment for Maria's Surgery</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Thanks to 15 generous donors, Maria received the life-saving surgery she needed.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xl font-bold text-green-600">€8,500</div>
+                            <div class="text-xs text-gray-500">15 donors</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success Story 2 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all">
+                    <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f" alt="Education" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">✓ Fulfilled</span>
+                            <span class="text-sm text-gray-500">Education</span>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-3">Lisa's Dream University Education</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Lisa's dream of studying computer science came true when 23 donors helped fund her tuition.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xl font-bold text-green-600">€12,000</div>
+                            <div class="text-xs text-gray-500">23 donors</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success Story 3 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all">
+                    <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136" alt="Business" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">✓ Fulfilled</span>
+                            <span class="text-sm text-gray-500">Business</span>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-3">Small Business Startup Fund</h3>
+                        <p class="text-gray-600 mb-4 text-sm">Anna's dream of opening a local bakery became reality when 42 supporters believed in her vision.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xl font-bold text-green-600">€15,000</div>
+                            <div class="text-xs text-gray-500">42 donors</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-12">
+                <div class="bg-white bg-opacity-80 backdrop-blur-md rounded-lg p-6 inline-block">
+                    <h3 class="text-2xl font-bold mb-2">Join Our Success Community</h3>
+                    <p class="text-gray-600 mb-4">Over 1,247 people are already making dreams come true!</p>
+                    <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold mr-4">
+                        Help Someone Today
+                    </button>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold">
+                        Share Your Dream
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-4xl font-bold mb-8">Ready to Make Dreams Come True?</h2>
+            <p class="text-xl text-gray-600 mb-8">Join thousands of people who are already changing lives through WishFulfill.de</p>
+            <div class="space-x-4">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold">
+                    Post Your Wish (€2)
+                </button>
+                <button class="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold">
+                    Browse Wishes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <h3 class="text-2xl font-bold mb-4">WishFulfill.de</h3>
+            <p class="text-gray-300">Where Dreams Meet Generosity</p>
+        </div>
+    </footer>
+</body>
+</html>
