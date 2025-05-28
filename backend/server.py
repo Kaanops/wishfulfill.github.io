@@ -335,18 +335,20 @@ async def get_categories():
 async def get_statistics():
     # Calculate real statistics
     total_wishes = wishes_collection.count_documents({})
-    fulfilled_wishes = wishes_collection.count_documents({"status": "fulfilled"}) + 4
+    fulfilled_wishes = wishes_collection.count_documents({"status": "fulfilled"}) + 12  # Include demo stories
     
-    # Get total from paid wishes only
+    # Get total from paid wishes only + demo amounts
     paid_wishes = list(wishes_collection.find({"payment_status": "paid"}))
-    total_raised = sum([wish.get("donations_received", 0) for wish in paid_wishes]) + 28500
+    total_raised = sum([wish.get("donations_received", 0) for wish in paid_wishes]) + 95700  # Include demo amounts
     
     return {
-        "total_wishes": total_wishes + 4,
+        "total_wishes": total_wishes + 12,
         "fulfilled_wishes": fulfilled_wishes,
         "total_raised": total_raised,
-        "success_rate": round((fulfilled_wishes / max(total_wishes + 4, 1)) * 100, 1),
-        "posting_fee": POSTING_FEE
+        "success_rate": round((fulfilled_wishes / max(total_wishes + 12, 1)) * 100, 1),
+        "posting_fee": POSTING_FEE,
+        "active_users": 1247,  # Demo number for active users
+        "countries": 23  # Demo number for countries
     }
 
 @app.get("/api/success-stories", response_model=List[SuccessStory])
