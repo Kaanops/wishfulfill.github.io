@@ -284,7 +284,7 @@ function App() {
           
           {/* Statistics Bar */}
           <div className="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-6 mb-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-center">
               <div>
                 <div className="text-3xl font-bold">{statistics.total_wishes || 0}</div>
                 <div className="text-sm">Total Wishes</div>
@@ -300,6 +300,14 @@ function App() {
               <div>
                 <div className="text-3xl font-bold">{statistics.success_rate || 0}%</div>
                 <div className="text-sm">Success Rate</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold">{statistics.active_users || 0}</div>
+                <div className="text-sm">Active Users</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold">{statistics.countries || 0}</div>
+                <div className="text-sm">Countries</div>
               </div>
             </div>
           </div>
