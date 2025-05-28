@@ -686,7 +686,7 @@ function App() {
               <input
                 type="url"
                 value={formData.photo_url}
-                onChange={(e) => setFormData({...formData, photo_url: e.target.value})}
+                onChange={(e) => handleInputChange('photo_url', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="https://example.com/photo.jpg"
               />
