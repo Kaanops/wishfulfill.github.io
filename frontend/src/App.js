@@ -671,7 +671,7 @@ function App() {
               </label>
               <textarea
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                onChange={(e) => handleInputChange('description', e.target.value)}
                 rows="5"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Tell your story... Why is this important to you? How will it change your life?"
