@@ -17,7 +17,7 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedUrgency, setSelectedUrgency] = useState('');
 
-  // Form state
+  // Form state - fix focus issue
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -30,6 +30,14 @@ function App() {
     urgency: 'medium',
     photo_url: ''
   });
+
+  // Fix form input focus loss
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   const currencies = ['EUR', 'USD', 'GBP', 'CAD', 'AUD'];
   const urgencyLevels = [
